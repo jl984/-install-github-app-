@@ -310,16 +310,32 @@ def enviar_email_firma(firma_info, adjunto_path):
     bod_num  = num_int(row, "BODEGA")
     bici_num = num_int(row, "BICICLETERO")
 
-    est_lbl = (f"Estacionamiento N° {est_num}" if est_num
-               else (f"Est. Uso y Goce N° {est_ug}" if est_ug else "—"))
-
-    unidades_rows = f"""
-      <tr><td>Departamento</td><td><strong>N° {depto}</strong></td><td>UF {uf(row,"PRECIO DEPARTAMENTO"):.2f}</td></tr>
-      <tr class="gray"><td>{est_lbl}</td><td></td>
-        <td>UF {(uf(row,"PRECIO ESTACIONAMIENTO (ROL)") or uf(row,"PRECIO USO Y GOCE. ESTACIONAMIENTO")):.2f}</td></tr>
-      {'<tr><td>Bodega</td><td>N° ' + bod_num + '</td><td>UF ' + f"{uf(row,'PRECIO BODEGA'):.2f}" + '</td></tr>' if bod_num else ""}
-      {'<tr class="gray"><td>Bicicletero</td><td>N° ' + bici_num + '</td><td>UF ' + f"{uf(row,'PRECIO BICICLETERO'):.2f}" + '</td></tr>' if bici_num else ""}
-    """
+    filas = []
+    filas.append(
+        f'<tr><td>Departamento</td><td><strong>N° {depto}</strong></td>'
+        f'<td>UF {uf(row, "PRECIO DEPARTAMENTO"):.2f}</td></tr>'
+    )
+    if est_num:
+        filas.append(
+            f'<tr class="gray"><td>Estacionamiento N° {est_num}</td><td></td>'
+            f'<td>UF {uf(row, "PRECIO ESTACIONAMIENTO (ROL)"):.2f}</td></tr>'
+        )
+    elif est_ug:
+        filas.append(
+            f'<tr class="gray"><td>Est. Uso y Goce N° {est_ug}</td><td></td>'
+            f'<td>UF {uf(row, "PRECIO USO Y GOCE. ESTACIONAMIENTO"):.2f}</td></tr>'
+        )
+    if bod_num:
+        filas.append(
+            f'<tr><td>Bodega N° {bod_num}</td><td></td>'
+            f'<td>UF {uf(row, "PRECIO BODEGA"):.2f}</td></tr>'
+        )
+    if bici_num:
+        filas.append(
+            f'<tr class="gray"><td>Bicicletero N° {bici_num}</td><td></td>'
+            f'<td>UF {uf(row, "PRECIO BICICLETERO"):.2f}</td></tr>'
+        )
+    unidades_rows = "\n      ".join(filas)
 
     asunto = (f"✅ Firma Comprador — Op.{op_num} | Dpto.{depto} | "
               f"{nombre.split()[0]} {nombre.split()[-1]} | Rep. {repertorio}")
